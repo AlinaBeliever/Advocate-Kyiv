@@ -20,7 +20,7 @@
   * { scroll-behavior: smooth; box-sizing: border-box; }
   body { font-family: 'Jost', sans-serif; background: var(--cream); color: var(--dark); -webkit-font-smoothing: antialiased; }
   .font-cormorant { font-family: 'Cormorant Garamond', serif; }
-  .nav-blur { backdrop-filter: blur(24px); background: rgba(250,248,244,0.9); }
+  .nav-blur { backdrop-filter: blur(10px); background: rgba(10,10,10,0.5); }
 
   /* Mobile drawer */
   #mobile-drawer {
@@ -152,6 +152,12 @@
     display: none; align-items: center; justify-content: center; padding: 20px;
   }
   .modal-overlay.open { display:flex; }
+
+  @media (max-width: 639px) {
+    .hero-section { align-items: flex-end !important; }
+    .hero-img { object-position: center 0% !important; }
+  }
+
   .modal-box {
     background: #FAF8F4;
     border-radius: 20px;
@@ -167,21 +173,21 @@
 <body>
 
 <!-- NAV -->
-<nav class="fixed top-0 inset-x-0 z-50 nav-blur border-b border-stone-200/50">
+<nav class="fixed top-0 inset-x-0 z-50 nav-blur border-b border-white/10">
   <div class="max-w-6xl mx-auto px-5 sm:px-8 h-[62px] flex items-center justify-between">
-    <a href="#" class="font-cormorant text-[1.25rem] font-medium tracking-wide">
-      Ілона <span style="color:var(--wine)">Борзенко</span>
+    <a href="#" class="font-cormorant text-[1.25rem] font-light tracking-wide" style="color:white;">
+      Ілона Борзенко
     </a>
     <div class="hidden md:flex items-center gap-8">
-      <a href="#about" class="text-[11px] tracking-widest font-light text-stone-500 hover:text-stone-800 transition-colors">ПРО МЕНЕ</a>
-      <a href="#services" class="text-[11px] tracking-widest font-light text-stone-500 hover:text-stone-800 transition-colors">ПОСЛУГИ</a>
-      <a href="#process" class="text-[11px] tracking-widest font-light text-stone-500 hover:text-stone-800 transition-colors">ПРОЦЕС</a>
-      <a href="#prices" class="text-[11px] tracking-widest font-light text-stone-500 hover:text-stone-800 transition-colors">ЦІНИ</a>
-      <a href="#contact" class="text-[11px] tracking-widest font-light text-stone-500 hover:text-stone-800 transition-colors">КОНТАКТ</a>
+      <a href="#about" class="text-[11px] tracking-widest font-light text-white/75 hover:text-white transition-colors">ПРО МЕНЕ</a>
+      <a href="#services" class="text-[11px] tracking-widest font-light text-white/75 hover:text-white transition-colors">ПОСЛУГИ</a>
+      <a href="#process" class="text-[11px] tracking-widest font-light text-white/75 hover:text-white transition-colors">ПРОЦЕС</a>
+      <a href="#prices" class="text-[11px] tracking-widest font-light text-white/75 hover:text-white transition-colors">ЦІНИ</a>
+      <a href="#contact" class="text-[11px] tracking-widest font-light text-white/75 hover:text-white transition-colors">КОНТАКТ</a>
       <a href="#contact" class="text-[11px] tracking-widest font-light px-5 py-2.5 rounded-full text-white transition-all hover:opacity-80" style="background:var(--wine)">КОНСУЛЬТАЦІЯ</a>
     </div>
     <button id="burger" class="md:hidden p-2 rounded-lg" aria-label="Menu">
-      <i data-lucide="menu" class="w-5 h-5 text-stone-700"></i>
+      <i data-lucide="menu" class="w-5 h-5 text-stone-200"></i>
     </button>
   </div>
 </nav>
@@ -211,9 +217,9 @@
 </div>
 
 <!-- HERO -->
-<section class="min-h-[100svh] pt-16 flex items-center relative overflow-hidden" style="background:#111010;">
+<section class="hero-section min-h-[100svh] pt-16 flex items-center relative overflow-hidden" style="background:#111010;">
   <div class="absolute inset-0">
-    <img src="hero.jpg" alt="Ілона Борзенко" class="w-full h-full object-cover" style="object-position:center 12%; opacity:.42;">
+    <img src="hero.jpg" alt="Ілона Борзенко" class="hero-img w-full h-full object-cover" style="object-position:center 12%; opacity:.42;">
     <div class="absolute inset-0" style="background:linear-gradient(105deg,rgba(17,16,16,.93) 0%,rgba(17,16,16,.55) 55%,rgba(17,16,16,.22) 100%);"></div>
     <div class="absolute inset-0" style="background:linear-gradient(to top,rgba(17,16,16,.88) 0%,transparent 50%);"></div>
   </div>
@@ -673,24 +679,24 @@
 <footer style="background:#0a0909;" class="py-10 px-5 border-t border-white/5">
   <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-6">
     <div>
-      <p class="font-cormorant text-[1.4rem] font-light text-white">Ілона <span style="color:var(--gold)">Борзенко</span></p>
-      <p class="text-stone-600 text-[11px] font-light mt-0.5 tracking-wide">Адвокат · Кримінальне та сімейне право</p>
+      <p class="font-cormorant text-[1.4rem] font-light text-white">Ілона Борзенко</p>
+      <p class="text-stone-400 text-[11px] font-light mt-0.5 tracking-wide">Адвокат · Кримінальне та сімейне право</p>
     </div>
-    <div class="flex flex-wrap justify-center gap-5 text-stone-500 text-[11px] font-light tracking-widest">
-      <a href="#about" class="hover:text-stone-300 transition-colors">ПРО МЕНЕ</a>
-      <a href="#services" class="hover:text-stone-300 transition-colors">ПОСЛУГИ</a>
-      <a href="#process" class="hover:text-stone-300 transition-colors">ПРОЦЕС</a>
-      <a href="#prices" class="hover:text-stone-300 transition-colors">ЦІНИ</a>
-      <a href="#contact" class="hover:text-stone-300 transition-colors">КОНТАКТ</a>
+    <div class="flex flex-wrap justify-center gap-5 text-stone-300 text-[11px] font-light tracking-widest">
+      <a href="#about" class="hover:text-white transition-colors">ПРО МЕНЕ</a>
+      <a href="#services" class="hover:text-white transition-colors">ПОСЛУГИ</a>
+      <a href="#process" class="hover:text-white transition-colors">ПРОЦЕС</a>
+      <a href="#prices" class="hover:text-white transition-colors">ЦІНИ</a>
+      <a href="#contact" class="hover:text-white transition-colors">КОНТАКТ</a>
     </div>
-    <a href="javascript:void(0)" onclick="openModal('concept')" class="flex items-center gap-2 text-stone-500 hover:text-stone-300 transition-colors text-[12px] font-light">
+    <a href="javascript:void(0)" onclick="openModal('concept')" class="flex items-center gap-2 text-stone-300 hover:text-white transition-colors text-[12px] font-light">
       <img src="data:image/png;base64,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" alt="Instagram" class="w-4 h-4 rounded-sm">
       @advocatekyiv
     </a>
   </div>
   <div class="max-w-6xl mx-auto mt-7 pt-6 border-t border-white/5 flex flex-col sm:flex-row items-center justify-between gap-3">
-    <p class="text-stone-700 text-[11px] font-light">© 2026 Ілона Борзенко. Всі права захищено.</p>
-    <div class="flex gap-5 text-stone-700 text-[11px] font-light">
+    <p class="text-stone-400 text-[11px] font-light">© 2026 Ілона Борзенко. Всі права захищено.</p>
+    <div class="flex gap-5 text-stone-400 text-[11px] font-light">
       <button onclick="openModal('privacy')" class="hover:text-stone-400 transition-colors underline underline-offset-2">Політика конфіденційності</button>
       <button onclick="openModal('cookies')" class="hover:text-stone-400 transition-colors underline underline-offset-2">Політика cookies</button>
     </div>
