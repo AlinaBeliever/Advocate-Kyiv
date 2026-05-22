@@ -1,0 +1,888 @@
+﻿<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ілона Борзенко — Адвокат</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+<style>
+  :root {
+    --cream: #FAF8F4;
+    --dark: #111010;
+    --wine: #5C1A24;
+    --gold: #B09060;
+    --sand: #C8AC88;
+    --light-wine: rgba(92,26,36,0.07);
+  }
+  * { scroll-behavior: smooth; box-sizing: border-box; }
+  body { font-family: 'Jost', sans-serif; background: var(--cream); color: var(--dark); -webkit-font-smoothing: antialiased; }
+  .font-cormorant { font-family: 'Cormorant Garamond', serif; }
+  .nav-blur { backdrop-filter: blur(24px); background: rgba(250,248,244,0.9); }
+
+  /* Mobile drawer */
+  #mobile-drawer {
+    position: fixed; inset: 0; z-index: 200;
+    pointer-events: none;
+  }
+  #drawer-overlay {
+    position: absolute; inset: 0;
+    background: rgba(0,0,0,0.5);
+    opacity: 0;
+    transition: opacity .35s ease;
+  }
+  #drawer-panel {
+    position: absolute; top: 0; right: 0; bottom: 0;
+    width: min(300px, 82vw);
+    background: #FAF8F4;
+    transform: translateX(100%);
+    transition: transform .38s cubic-bezier(.22,.68,0,1.1);
+    display: flex; flex-direction: column;
+    padding: 32px 28px 44px;
+    overflow-y: auto;
+  }
+  #mobile-drawer.open { pointer-events: all; }
+  #mobile-drawer.open #drawer-overlay { opacity: 1; }
+  #mobile-drawer.open #drawer-panel { transform: translateX(0); }
+
+  /* Floating CTA */
+  #floating-cta {
+    position: fixed; bottom: 24px; right: 20px; z-index: 100;
+    width: 52px; height: 52px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 8px 24px rgba(92,26,36,0.38);
+    transition: transform .25s ease, box-shadow .25s ease;
+    background: var(--wine);
+  }
+  #floating-cta:hover { transform: scale(1.08); box-shadow: 0 14px 32px rgba(92,26,36,0.48); }
+
+  @keyframes fadeUp {
+    from { opacity:0; transform:translateY(28px); }
+    to { opacity:1; transform:translateY(0); }
+  }
+  .afu { animation: fadeUp 1s cubic-bezier(.22,.68,0,1.2) forwards; opacity:0; }
+  .d1 { animation-delay:.15s; }
+  .d2 { animation-delay:.35s; }
+  .d3 { animation-delay:.55s; }
+  .d4 { animation-delay:.75s; }
+
+  .reveal { opacity:0; transform:translateY(22px); transition: opacity .75s ease, transform .75s ease; }
+  .reveal.in { opacity:1; transform:translateY(0); }
+  .reveal.in.d-1 { transition-delay:.1s; }
+  .reveal.in.d-2 { transition-delay:.22s; }
+  .reveal.in.d-3 { transition-delay:.34s; }
+  .reveal.in.d-4 { transition-delay:.46s; }
+  .reveal.in.d-5 { transition-delay:.58s; }
+
+  .divider { height:1px; background: linear-gradient(90deg, transparent, var(--gold) 40%, transparent); }
+
+  .svc-card {
+    border: 1px solid rgba(255,255,255,0.07);
+    background: rgba(255,255,255,0.04);
+    transition: border-color .3s, box-shadow .3s, transform .3s;
+  }
+  .svc-card:hover {
+    border-color: rgba(176,144,96,0.4);
+    box-shadow: 0 16px 40px rgba(0,0,0,0.25);
+    transform: translateY(-3px);
+  }
+
+  .price-card {
+    border: 1px solid rgba(176,144,96,0.16);
+    background: #fff;
+    transition: all .35s ease;
+  }
+  .price-card:hover {
+    box-shadow: 0 20px 48px rgba(92,26,36,0.09);
+    transform: translateY(-4px);
+  }
+
+  .step-num {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 3rem;
+    font-weight: 300;
+    line-height: 1;
+    color: rgba(176,144,96,0.25);
+  }
+
+  input, textarea, select {
+    background: #fff;
+    border: 1px solid rgba(176,144,96,0.28);
+    border-radius: 14px;
+    padding: 13px 16px;
+    width: 100%;
+    font-family: 'Jost', sans-serif;
+    font-size: 14px;
+    color: var(--dark);
+    transition: border-color .3s, box-shadow .3s;
+    outline: none;
+    -webkit-appearance: none;
+  }
+  input:focus, textarea:focus, select:focus {
+    border-color: var(--gold);
+    box-shadow: 0 0 0 3px rgba(176,144,96,0.1);
+  }
+
+  @keyframes bounce {
+    0%,100% { transform:translateY(0) translateX(-50%); }
+    55% { transform:translateY(7px) translateX(-50%); }
+  }
+  .bounce { animation: bounce 2s infinite; }
+  .check-li { display:flex; gap:10px; align-items:flex-start; }
+  .check-li svg { flex-shrink:0; margin-top:3px; }
+
+  /* Cookie banner */
+  #cookie-banner {
+    position: fixed; bottom: 0; left: 0; right: 0; z-index: 999;
+    background: rgba(17,16,16,0.97);
+    backdrop-filter: blur(12px);
+    border-top: 1px solid rgba(176,144,96,0.2);
+    transform: translateY(100%);
+    transition: transform .4s ease;
+  }
+  #cookie-banner.show { transform: translateY(0); }
+
+  /* Modal */
+  .modal-overlay {
+    position: fixed; inset:0; z-index: 1000;
+    background: rgba(0,0,0,0.7);
+    backdrop-filter: blur(4px);
+    display: none; align-items: center; justify-content: center; padding: 20px;
+  }
+  .modal-overlay.open { display:flex; }
+  .modal-box {
+    background: #FAF8F4;
+    border-radius: 20px;
+    max-width: 640px;
+    width: 100%;
+    max-height: 80vh;
+    overflow-y: auto;
+    padding: 36px;
+    position: relative;
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="fixed top-0 inset-x-0 z-50 nav-blur border-b border-stone-200/50">
+  <div class="max-w-6xl mx-auto px-5 sm:px-8 h-[62px] flex items-center justify-between">
+    <a href="#" class="font-cormorant text-[1.25rem] font-medium tracking-wide">
+      Ілона <span style="color:var(--wine)">Борзенко</span>
+    </a>
+    <div class="hidden md:flex items-center gap-8">
+      <a href="#about" class="text-[11px] tracking-widest font-light text-stone-500 hover:text-stone-800 transition-colors">ПРО МЕНЕ</a>
+      <a href="#services" class="text-[11px] tracking-widest font-light text-stone-500 hover:text-stone-800 transition-colors">ПОСЛУГИ</a>
+      <a href="#process" class="text-[11px] tracking-widest font-light text-stone-500 hover:text-stone-800 transition-colors">ПРОЦЕС</a>
+      <a href="#prices" class="text-[11px] tracking-widest font-light text-stone-500 hover:text-stone-800 transition-colors">ЦІНИ</a>
+      <a href="#contact" class="text-[11px] tracking-widest font-light text-stone-500 hover:text-stone-800 transition-colors">КОНТАКТ</a>
+      <a href="#contact" class="text-[11px] tracking-widest font-light px-5 py-2.5 rounded-full text-white transition-all hover:opacity-80" style="background:var(--wine)">КОНСУЛЬТАЦІЯ</a>
+    </div>
+    <button id="burger" class="md:hidden p-2 rounded-lg" aria-label="Menu">
+      <i data-lucide="menu" class="w-5 h-5 text-stone-700"></i>
+    </button>
+  </div>
+</nav>
+
+<!-- MOBILE DRAWER -->
+<div id="mobile-drawer">
+  <div id="drawer-overlay" onclick="closeMob()"></div>
+  <div id="drawer-panel">
+    <!-- Header -->
+    <div class="flex items-center justify-between mb-10">
+      <span class="font-cormorant text-[1.15rem] font-medium tracking-wide">Ілона <span style="color:var(--wine)">Борзенко</span></span>
+      <button onclick="closeMob()" class="p-1 text-stone-400 hover:text-stone-700 transition-colors">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+    </div>
+    <!-- Links -->
+    <nav class="flex flex-col gap-1 flex-1">
+      <a href="#about" onclick="closeMob()" class="text-[13px] tracking-[.18em] font-light text-stone-500 hover:text-stone-900 transition-colors py-3 border-b border-stone-100">ПРО МЕНЕ</a>
+      <a href="#services" onclick="closeMob()" class="text-[13px] tracking-[.18em] font-light text-stone-500 hover:text-stone-900 transition-colors py-3 border-b border-stone-100">ПОСЛУГИ</a>
+      <a href="#process" onclick="closeMob()" class="text-[13px] tracking-[.18em] font-light text-stone-500 hover:text-stone-900 transition-colors py-3 border-b border-stone-100">ПРОЦЕС</a>
+      <a href="#prices" onclick="closeMob()" class="text-[13px] tracking-[.18em] font-light text-stone-500 hover:text-stone-900 transition-colors py-3 border-b border-stone-100">ЦІНИ</a>
+      <a href="#contact" onclick="closeMob()" class="text-[13px] tracking-[.18em] font-light text-stone-500 hover:text-stone-900 transition-colors py-3">КОНТАКТ</a>
+    </nav>
+    <!-- CTA -->
+    <a href="#contact" onclick="closeMob()" class="mt-8 text-center py-4 rounded-full text-white text-[12px] tracking-[.15em] font-light transition-all hover:opacity-85" style="background:var(--wine);">КОНСУЛЬТАЦІЯ</a>
+  </div>
+</div>
+
+<!-- HERO -->
+<section class="min-h-[100svh] pt-16 flex items-center relative overflow-hidden" style="background:#111010;">
+  <div class="absolute inset-0">
+    <img src="hero.jpg" alt="Ілона Борзенко" class="w-full h-full object-cover" style="object-position:center 12%; opacity:.42;">
+    <div class="absolute inset-0" style="background:linear-gradient(105deg,rgba(17,16,16,.93) 0%,rgba(17,16,16,.55) 55%,rgba(17,16,16,.22) 100%);"></div>
+    <div class="absolute inset-0" style="background:linear-gradient(to top,rgba(17,16,16,.88) 0%,transparent 50%);"></div>
+  </div>
+  <div class="relative z-10 max-w-6xl mx-auto px-5 sm:px-8 w-full py-24">
+    <div class="max-w-xl">
+      <div class="afu d1">
+        <span class="text-[10px] tracking-[.18em] font-light px-3.5 py-1.5 rounded-full text-stone-300" style="background:rgba(176,144,96,0.12); border:1px solid rgba(176,144,96,0.22);">АДВОКАТ · КРИМІНАЛЬНЕ ТА СІМЕЙНЕ ПРАВО</span>
+      </div>
+      <h1 class="font-cormorant text-[3.2rem] sm:text-[4rem] md:text-[4.8rem] font-light text-white leading-[1.08] mt-7 afu d2">
+        Захищаю<br>ваші права
+      </h1>
+      <p class="mt-6 text-stone-300/80 font-light text-[15px] leading-relaxed afu d3 max-w-sm">
+        Адвокат у кримінальних та сімейних справах. Розлучення, аліменти, захист у суді.
+      </p>
+      <div class="mt-10 flex flex-wrap gap-3 afu d4">
+        <a href="#contact" class="px-7 py-3.5 rounded-full text-white text-[12px] tracking-[.12em] font-light transition-all hover:opacity-85" style="background:var(--wine)">ЗАПИСАТИСЯ</a>
+        <a href="#services" class="px-7 py-3.5 rounded-full text-stone-300 text-[12px] tracking-[.12em] font-light border border-white/20 hover:border-white/40 transition-colors">МОЇ ПОСЛУГИ</a>
+      </div>
+    </div>
+  </div>
+  <div class="bounce absolute bottom-8 left-1/2">
+    <i data-lucide="chevron-down" class="w-5 h-5 text-white/30"></i>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section id="about" class="py-24 md:py-32" style="background:var(--cream);">
+  <div class="max-w-6xl mx-auto px-5 sm:px-8">
+    <div class="grid md:grid-cols-5 gap-12 md:gap-16 items-center">
+      <div class="md:col-span-2 reveal">
+        <div class="rounded-2xl overflow-hidden" style="aspect-ratio:3/4; max-height:560px;">
+          <img src="aboutme.jpg" alt="Ілона Борзенко" class="w-full h-full object-cover object-top" style="transition:transform .6s ease;" onmouseover="this.style.transform='scale(1.03)'" onmouseout="this.style.transform='scale(1)'">
+        </div>
+      </div>
+      <div class="md:col-span-3 reveal d-1">
+        <p class="text-[10px] tracking-[.2em] font-light mb-4" style="color:var(--gold)">ПРО МЕНЕ</p>
+        <h2 class="font-cormorant text-4xl md:text-[3.2rem] font-light leading-[1.12] mb-7">
+          Ваш адвокат<br>у складних справах
+        </h2>
+        <div class="divider mb-8"></div>
+        <div class="space-y-5 text-stone-600 font-light text-[15px] leading-relaxed">
+          <p>Я — Ілона Борзенко, адвокат у кримінальних та сімейних справах. Представляю клієнтів у судах, захищаю їхні права під час обшуків та затримань, супроводжую розлучення й аліментні справи.</p>
+          <p>Підходжу до кожної справи стратегічно — від першої консультації до результату.</p>
+        </div>
+        <div class="mt-10 grid grid-cols-2 gap-4">
+          <div class="rounded-2xl p-5 border border-stone-100 bg-white">
+            <i data-lucide="shield" class="w-4 h-4 mb-3" style="color:var(--wine)"></i>
+            <p class="font-cormorant text-lg font-semibold mb-0.5">Кримінальне право</p>
+            <p class="text-stone-400 text-[13px] font-light">Обшуки, затримання, суд</p>
+          </div>
+          <div class="rounded-2xl p-5 border border-stone-100 bg-white">
+            <i data-lucide="scale" class="w-4 h-4 mb-3" style="color:var(--wine)"></i>
+            <p class="font-cormorant text-lg font-semibold mb-0.5">Сімейне право</p>
+            <p class="text-stone-400 text-[13px] font-light">Розлучення, аліменти</p>
+          </div>
+        </div>
+        <a href="javascript:void(0)" onclick="openModal('concept')" class="mt-8 inline-flex items-center gap-2 text-[13px] font-light text-stone-500 hover:text-stone-800 transition-colors group">
+          <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAbv0lEQVR4nLWba7RdV3Xff3Outfc596H7kGQsC7+E3Ro/iDHmaRscYywSWmAEuB4hhTQ2I9CHGYDdZDT9Ytx+SDtKzSOGtkl4JGncVIImtCUDY6iTYoHfNjWWbWzAxrZsSbZ0pfs45+y915r9sNbe51xJJF+aPcbS3tp3n33W/M//fK51hBMeJktLu3X37qsDwFXXPbbDSXGFxXiJEM7F4naMeTGbMqxQQwDEAAwMpD2boYCa4cxQM9TI58lr0ohRtP2cgUZQQKIh+RkxTA0kYGLUzmQgkSNqss8hjypuj3d6x+/cdtFTALuWdrml3UtR8gwnDzn2xo03mt50k0SAd3z48beIc9eZhavUlQuCQGzSsJiHIRhi6d0tCGLthA3HWNDjQTjRGTSOP5+FHt+LTIAhqAnOFDWPQyEaMVTLit7ugv3e9d9743ePle2EACwt7XK7d18d/uH779sqM5tuVvUfVPWEahWLTRQwwQQQwRCQscDjc9K64SY07exYEECZACOO/36c4BsAYSMIETAziaCGEcXETFS89vwMjQVibP54vV69/l/de9VLu5Z2uaszszcA0Ar/zl+9/xdcb+ZrRTF1djU8HAUzAZWx0FnrE+dW45nqrfBug/BjoZ39DWYwIaiakQXrQDmeAYZ05JY8n2SAZkRBZLpY0FEcPDGMa++94a6rHp4EQSap8StXP3SBK8o7VNzWUK/VKhSTwm3QdAaj/dtY62OBHS0AxzCBVuMnNoGOAROCtsJLvidG/t6x2EyepZsxZtQ9N1MEiwdrHVxx3Z4rH2lllhu5Ubnxk+zd+/0FZeo+p+WOUK81KuKPF3ij0C04SdiscWIGYYLuJ9C6y9przydmwRiQDUID2FjbY6HHYFj3ZJ65xabnZ30Vq5803r12/52XHYFP4vcunS+7b5Lwa++853O93vSO0fqhpkC9ECY/nh3d8dqf1LonA8HY8bljNf+3RoIJW2csdCeqWboyOi13f7XJJyV/QEnWIT6E1XrOL75ipV7+7E3Ir+9a2uUE4AM791zSK2f3NPV6EDG3UWg7BoiWAVloAS+GNBHqAHVAQkRjRGMWPE74AU4gPBOCj6efhBdJDkgFcYrzihaKqKaIG23iE0x+OuNxDBOQULq+G4Xhm665Z+ddHqAM3NCrMWka007oCYGPvWeG16TdsFYTqobpKcf81h4LW6eZXSzpT3t6fUdRKt4rziVPqllxG+g8qV1LZwtGrCNhFAmDhmatZnRoxODAkMGLA5r1gCsdxXSREoMwyYg8c5swB8mSGNZHaSTeACzJh992++lSlY84kVliY5PeXomdxlvqK0bhoFmpcGaceeEiF1yxnR2v3cqW02fozRb8XR71Ss3K0yscuPcAz377WV76wUuA4DcVWGMTtp+BkBy86SQzFSfBbCWInSf/7NK/urb0vS/WzVpUQbWN5cQNzk7z8ALV8pCzXrOFt37klfy9S0/eMEFraWmGHZd3kTR8guO4jOwY8xYRROW4B1/47j72fuGHvHj/QcqFfk5Ek4+wVuuSg3nLYSH23LQOrLrGq8RLHYZh1jo1Juiu+dw6tuboiLf95jm87boLUCdJ4BAxA1VBXBonEOn/y2HBEsAC6pRtb97OyW/axiOfeYgf/eFeik297CcnhJ7gtSEQxQo1qy1c6j3xXI01alEEQyUi0mo8dpov1KiPDnnXb1/EGz9wDmYQQzYVr90EYxOpViqa9ZowCoQqYE3EwgQrOma1UiUNQzZVTdrWQtHS4XoOP1VQzJWI1wxwAgNAnHLBv3gN/S19fvhv76ec62WQutQN68xAiSBYLS7Gc71Ys10wnNTihE5oyWdnEe+gOjzgit+8gDd+4BxiY0nT2TsPl4f89Pan2HfXsxx9aplqeYgNG6yJSIiQI8JkPKcLc5NpTLqWHM9FBXXJ67uep1zoMbtjga2Xnsq2t++gXMiCAtZEzr7mPOqXBjz5nx+mWJzCmgii2RQs5wOGICLWoBa2y2+9+X8dKpBFrDHFRMQQi12e7sWI6xWnXbCFD3757ZgloTFDVHjsa4/xwH+6n/V9K3gVfCE4l0KXa3NoyKC2Yc6S4GbjhMbG6Wz3r42HGRBJjq6JTJ0yy9kfvZhTl16JRUNEOjDu+rW/ZPnhl3AzBRZb289mkY1cxUttdsgX1kw5ESCkP3fxOuJIyU2wwC9edyGi0lFZVLjvlnt58JZ76W8q2bRQ5rw8MygnPm2Wl766C1DjkUNixwHLSc6ENxcFUSUMGiwY2nOEowMe+a3/zWjfCmd97HWd8OKEv//xi7j/mttw5nJkbX2BgsSEeQw4mPKOWGj2+to5v5TOFmrEtRFnXHgSp7/2lEyfxIAn/uIxHvq9u9m0dQqJEWnqlP21ms4OVTYIfwIAWjFlAgzLjisPQQhHR8y/6mSmdywyePoIRx8+QH9rj5/cfDfTp81xynvO6ZSz5Y3bWbzoJI48dAA3U2Ix0z8zLfmCAIj3jiit4GCotZqPlAJVVfPKt52RMs3GUK+Mjgz5wS13M7PJ42KTtN6mum30sInrVtAWQDlGeI5Jeds/mCCiNCs1Z/6TN7DjY29EnIIZT33+Xp6+5V76CwVPfeZuTrryTPx8L/kdL2zbeQZH73kON1sQmQCgjQoogqk6iynmE3EW8EQKAgUBFxqmpx2nXnxK9tbpFT/79o8ZPHuYshQ0BLxFPBFPSO+wfE26dpbvq+FdAtc1DVpVSFXhmgYnEecMJ21BFXEaYTRk7tzNvOL6SxCn2bEJZ173eubP34qEQLXvCC/e/uM8xTTHxdefQjHlkBC6ytRZzE4+ohbAoqrkG0n4QJmFLzC0qpnf2mf+9Llsiync7d/zFIWz7jNJ6ICP+Wzje84CXgwvEVYHxEMryHBEOeOYOnmG6ZfNUE47ZDDCXlqBtUECSBMYMqqZPWsxOcIQEZ9BMGPm7EVkWOHVWP4/T+c5Jh5NnTFH/6Q+UiVwxSIqEc0gSA7zXrPHdwQ8hjdLGlTD6pq5k/op37bkYGKIrP30JUoPPjQbIkbr5Db4AafEtSGYsXjRqWy58hzmXnMq/Zcv4GZKAMJaxei5ZVbuf4bD3/kRqw8+A6K4TT18KQx+tB+wjgGS847h4/txRXIeo5+8hAXLJgJutqT3smmq51fRUhGzziATSSIIeEfEkSjsWuGJFEDTNEwv9BK1YkScUh8dEg6vJgYQOsepE0Na+1chHFph/jWnccZ1l7P4lrM50eGmS8qTZtn06lPZ/qE3sfzXT/LcLX/N2oPP4LfMMnpiPz/73ds59fq3on1PrBqe+9ydDB59nmK2TxwFwuF1wtEhfnGqm2tvscdq0yDis59JFWI7YzXwyU4t2/AYCGdgFujN+M78BQjrdaKdGC7GCaEnNI8hAvHIgNM/fBlnXn8l4l1H4/Qy6eja1g5IKnkXLj+b+Ut28Ox/+A77v/g9ivkpDv7RXazs+Qn9MzczemaZ9ccPUsz2MWtQBwxHhPUavzjV1Rt+xqOWlNSmFGKRKCn3MMB7M4rOB+TML8d/YkPZ1w0OMI4atG6SPQFqccyANuSpEI8MOOt3fpnt116Sy9vUjJWJtLk9WiCAieccp/3LnZQnzfDc795GsThD/dRBRj/aj5SOYraEGFKW5wSLNTZq8ksys/o+RSiJpLaBAoYzTdUP4IvOU7faz0MSA4rSbZhsrBok1DgvE0nThBk4JRxa4bSPXM72ay9JNusk5foqNMvrLH/zYVbv/Sn1/qMAlCfPM/v6Hcy//QL8wjRptoY1xskfupTw4goHfv+7+C2bsH7KHi0GusRJhBgDVjdMIuB6mhstSVmx6yIlkBXBuzj2Ad5izgMiHiBGvD+mqqtTePTOdfVCZwIqxNU15i46ldNu2Jm8tsuZnQovfe0+XvjMt6iePZyrRkUM1kNk+b/fx4FbvsO2T+xk8T0XQ0z1hoXIKTfsZP2en7K+dx863csLLpoaITmbkBCxJmyYqhaCElADy72NaIKJ5tAvqKMRTwpZmsNaywRPwLUEyLSymMxFCR1bWtCU1Ao7/Ya3J2/cWo4KL3zmNp65/k+Jh1coN09RzPUopgv8TEE536fcPI0dXuXZT9zKgc/dDipdTBevbLv+KrQJnUaFkP1OG4UiZPNp5yoq6VmJExmpdWYrRNRb0nwXCbI/cDm+6zEEkBjxNHhp8FLjtMZpg3MBWVtj/uLTmHvT2ZlvaRKH//w+9t/8Dcot07hCkKZGQ4PEBokBQoPUNeqFcss0Bz/1lxz5+gNd3oEZs5eczezFp8PaILfWMghtlW+x+85urg4gZsByLpBzALHU8FFHK2wCok1kvDUUUuO0pVUWSCKFH1IUFd6nUfgRRVnhbJXNv3RexxRxSlhe48Cnv04xV6DWoLHpkpE00vcn9iRA/KaCg5/6BuHIeor9IcXsTVedB6MK1XE7vmMDsXPUnQloxGnoMt32mdZ0BUOdRVyMeGtwUuOlpnAVpa8oihHOZQCkPUV8McL7Eb4YURTp7HREOQezr9nRaQ1g5TsPEl94nmLGcDJCtcZJncCwkOiYJyVEJAZcz9H87CCr33o4vStrdvriM3FTHglZqJzZSbtOyUYAksICqiExoaX9xPf5goZCY6K0NskHaMR7wxXDDoBxoRIpfIUrJm0JCAG/pU+5fXP7IACj+x+h6NeoH6UJtiuMUfO15u7tRGkUwakxuOsJ5pfeQGuHxcsX8fN94loNuShKoS2F4+OEb+1dIrmFgaBEImIOEcMXvqKUkISXgJeAkwZfgBUVTpuNL5XEAFdM1P4CWE0xN41O9bL9pYnFQwdw/YD6KpV8WXAzgahYkHxPx3WjJfsNLxxO78q+QGdKdKogHh2grsjlbURI8f24xe9UgiatK1gUorVPR8QEX7oRpZsQXAJOA95D9KNMn0kADF9UOE+2vzEA6uvjeqHqG1wxQr3rSlyLkrQfFVPNbFAspDP4LNjxWlXGDq1Nbdvk9lgTmFzPsNzEkQhmrmOuL4uKQgNeGpwEvAacBJxPDFB3IgBqtJAxAGRbq1eIgwGu34MYwTmKbfM0OkLLMldxmfpxbAat4KYuXQvEUFFsmycpOSLqsLURtjZENWnekC4fkBOYAJ2tZ4AsmULMTRHB0MJXdGPCs3tf4YtqggEZXTVcUeGKGucrnM/nfoDhIeKB/d2kAfoXn4/qEC2a/Gxiivqmu3ZFjRZNuvYVWtQ4rZh6Uy6eshNsnjuELa+iTsZenZDYsmHfQ8uEiZAnqakoEhEds0t9Ft77Oo8KX9R5VOhxPsA6QVzRJCCKGi0jGlapH/thfi7ZQv+ySyhO34rGNbQXkvDF5GhQ32RQarQXkGad8hULTO+8KIOe3jW870kYDnPrLE6Es5hb6xsJIG0nVXI3SnI/U0ICgogWk4L7Cu/HmvK+QuUYE1BLgh+rTVfhpqG65470oHOpHb5pE5uu/Q2kOowWAS3DxOfSkPa6DGgRkNERFq5fQudmIMSuDbZ+2wNI6cAaxitXEzH+OBOYAKH1B5LPmQW6Qeud4FnDvkFaBrR5gMpYa0WDa7XnKtymkvjkg9QP35vVYRAjvSt2MnPNh5C1AwjraB+0FxNryojrRbRvqK3D0ReZ+9j7mXrHZcmPJDox3PMI9YOPozMlErNAXWKTBTs2bY0TJsDEZ/JZNOK9q/AuoBJwGvM5oE6gqBHqjQxwgisC4uuxc2npJgplYLjr8xTnfXHc946Rqfdfi9u2jeGtf0B4fh9iHsQnr18bNKAvO5VNv/1R+r90ZRK+XdBoAkc/99/QMoI0RDQ7v2TnZpLo7Vot5XMYO+m2H9Q+a2YppDtf43LKqDkCqMYEgG+QONqIqneJpn4cZlq+iQGzPeynDzLc9Tn67/8EhAY0mUN5xTsoXncZ9ffvoHnkIeKLL0IUZPPJ+AteTXnZW5DZTcnpZeBwjpXPfIVm76O4+UXiqEJjat1gmjEKyc79xtKdusmht2242HieGBh475sMQJMEnwSgaJAwyKDmRYqiQHuG0GSrmGQBQICFWerbvoQubKb85X9Mt7QTAzI7R3nVuymvevfxNptpm7y4A+dY/y9fZXDr1/BbFoh1hXqXvq0hF+2a5uEUKf2GV9lozFLBckncrguk1SnvXKrkkvbjGAQv4AM06xtNoCzRUpBQZVDabjtd/i8IzE1Tf/Xfwcp+yvd8AnyRng1N1/6irfZinLjnQBSrawa//4es/9c/xy3OY02NOkfM36eANWBWpN5B6ZBeBiBbgA2rLkFql9qsXZjMLPDJg7eaD6nVpTH12YqI1Cv5pZkBvWl0ysNgHXEuZ2z5kXaHB6RFjfkZmtv/gPjkfRTv/Oe4V10ObqOWyNqbPOp7v8fwT75C/fDjuMVFYt1uzLTc2Ul1g+aaIjaC9gtkusxTTTOKq8O0rJZ7gpO+IMdGvHMBda3wmf6STaA0GLyUpUuTlOk53PwcNjwIvpcrsYkMeDIjtYAszMNzD1N94SPojotwF16JnnUxsvXl0J9Nzw1WiQf2ER77Ac3d36Xeuxeix22Zxaoqa97RFkxqyZerCTGknaG6OIObm07vy9EgHFrNNUmb9yUworQ9BEkMUI0JgJYBEhNypcDq89hoDenNQAygDt12BnH/I4gvO5ttKbYBBCNpbqaX8vanH6B58m5wUzA1D8UsRCEOhtjRVWxQgfZxm2aTYHUF2bGlJlbo3i+ZZapKbGqKs16WmBQiOCWuDgn7l8FrLpUnWTaeqNeWARI7AEQjKoYUCmsvYC/+DHn5uflFDn/um6l/+HWksBxr6Wxqo/BpksnGQWb6wHTa5VGvwnAlRQHzMF0gU31oBKtrVBzR6QZgu+u8YJoqoYhIzfTlGxsx9VMHiQePIEWZWmtmY0fe9YQFdS6YagbBRaQ9+4CUisRVwlN3MzEF9IKd6MtejjBECgFvUFgKjYXlQR4GBeABF0DqlIWVgvQd9H26lpByDm0Qn75fXQQX0lxcO9I9dQHxBvUQf+Zmptq0OQs5vPsJ4vqwa8qKjLXS9gcFi6quMfUxvdAF1FsnhLqA9AviY99MH1aXQtnUAv5tN0A4mkAqXQKiFChdHtoNKaUblJLAcjENbZJgPnZCkgUdg9A+m+foQnpHEbHBCvMfe99xafPaNx9KYTFXrBup3x3Rq7Pa+egQQ50h2o7U/JByBnv+AeJTd6Fnvqmza331+3ArzxL33Iz05sD3xwkH5LifO7uRPAwJKW8hGASQhrSmJ5EJV5rd1pjuhiYtKqCKrI+Iy0eZ++g1TL3zLRvS5sGdjzF64MfopplclbbdI5l4e8oxvfg4dAX9KGaiiGgKz9IOJyBKuPPT6Omvz3MUsIh788eRzacS7/k8rOxLbRxX5naso9v+0rbsJkCgyZsbG0Maw5o0T2kMmlTAtG5FYi5oGrDhGjZS9KTTmPn4dfT/wc5x2mwGIbJ8819023iO69BkBNJyCgMvBUd8wUJNmreqdMK3WzulP4cdfIhw12dxl1yffjChKQfQ89+Hnn0V8Sffxp67C448BcMjWDOCpoEQkqOMEYLlnV1tcjKxa8zG298SwKkzJK4Edcj0DDa9Gb9tB+7CN1BedjmyaSJtDhG8Y/nf76J68AlkfiF3k/UY6uclMYRa7IhXz/NFT84IUUwVUWeggmpaysIlFkh/K/bwl4mbTkJf9cFOCCxAbx49971w7nvT/6sVqAdYqCBU+Vcm41+YjLfE5lfk/wuSLSjtNUEL8CVS9KA3hcxsSsB3FpyiCyLgHat/9D9Z+dL/QDcvEquQWDghOON0yJyoQNznXaF7fSlvkCaY5G1d4iYEd5q3eylMbcEe/CyxWUYv/KegOauLTeaqJhr1FqC3cGLyneCQn3N9wiOkDhAiXVZpTWD1C3/Cype+gVtYIFYh7RozxzhZ3/CN5kSNGB716mWPebkWVKQV2ud1Oy+pI9vud1MH/S3YE7cSl/ci5/0GcvIbxkC0SJtNnDnhFE5062+Ep60dXPYv+R3VPfew9uU/Y/TAE+jiZuIopOdUk8m1VaCM52KkvWKG7JH1z+88zcLa3qKU2SCYFiJJ+LwjUycYoC0gHppBmtvm85Ftl8KWX0Cmt6fs7u/wsLUV4vPP0Pzfh6ju3EP1wyeITQHlHHGkxKogNCVWF8SmIJrHJC/hiiMieY8gK7VxngCs/8fLvzY1535lVMWghXpaAPIe/QSC5l2POmaDCIQhxAbxU9BbhHIzlHPgpkF7yY7FJ022ewBbu89RIY2YQ2Ne5a0DVtUwHGLrQ+LKGvHQMvHAi4T9h4krFSbTWLEJqz2xcsRW6LodJdEK2iVUEgDNnJvxh+Pwq+f94F8vJe4W/lPm3HukjIJ3qNds+3oMA9oYmYKIiELZIzmtCHENBkdhLTu8aJ3js1bQvHWWkHZ8EiI0Easj5GF1hCpilWGjiFWSh2JNgUwVqJ8i1g6r0j6BNLfU6xv/9i7lGh17si2NLGDefQrA264lJ1fv/v7g1rf/aX/LzD+q15pGCufZAMBYeGlZkEEYb+rzQJnjcVuQt97eUiyPMQORAJAQU6hqItIErLH0i5PasDogVQKCkaUxNGRkMKBbMBURTMcJnMmE8Nn2x7mZ1QvFVPFiPfzj8x/6N3fb0pITuxGFG+F1T8w3cf0+P128IoziBhBkg/azCTAJAmzw31noDoR2D1DMu8ZjZkGTAQgRmjDBhIDVEasijFompBFHYEPDBkIcSqJ+5bGmINae2BSEuhybQF0SzRNMmhk/7dcs/LhEX3vmDzj6ScDLTUQzVOTWw6Ov/+q7osgdbt6fFEehFu+LSe1vAKBlAT8HAMba7zo+MVHUYhY6V57pN7AKklZ9UxqczMgmfqGaEirSWkhjSNBE8bQpufvBkUxqXwyLVs/4qaImHKhF33XOQzctGzfqTdwUNVnFTdF2Lbneu//skWYoV0bxT+hJ84V5H80VwXxp+JITj+Ln3G//Vhz3f2nvF+MxvueRoj17pHBIOT5TOCg0n1PIxk2A0AotmIkFE4sLxXTRmD2+bPbWCx66ae+upSUn3BSPURtkfxDs9g9uifMzN2u/+HX6JQwaYiSmaknSjidVRFQ2an9cbIxZYGNnGMf0t5wid/QPrQmE7tdnyRmG7AgjNozEkRGHRhyADSGuQxioxaEj1t5iXVqovWjT0ymbZTDyjBr/lReq0Q2X7P30IVtacrJ79/E/ne1AsBtVJKFT3ffxN7u+vw6RndrvLeB1XNm1zY6J19jGF6X8vkt949j2W8FjyD4gZB+QRx0SEFVIgrcgjHJUGE6AMBAYKAwdUnmoezR1wXDkDlvof2vYFLecdffNd6b53ait5n8uAO3c2b2kcnVCavDojWf2C34RuCRGOU9VT4mwoMhURAoV0Q3vmswEbewAY8eC0AFAyCA0G0EYA5BBGIXkDIeRODRsEC2OCGGdxgaybut6JA79PqvKRwn9PaHp/dX2O77wNMCupSW3tHvXCX8+//8AkgInQLZxChkAAAAASUVORK5CYII=" alt="Instagram" class="w-4 h-4 rounded-sm">
+          @advocatekyiv
+          <i data-lucide="arrow-right" class="w-3.5 h-3.5 transition-transform group-hover:translate-x-1"></i>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SERVICES — Criminal only -->
+<section id="services" class="py-24 md:py-32" style="background:#111010;">
+  <div class="max-w-6xl mx-auto px-5 sm:px-8">
+    <div class="mb-14 reveal">
+      <p class="text-[10px] tracking-[.2em] font-light mb-4" style="color:var(--gold)">ПОСЛУГИ</p>
+      <h2 class="font-cormorant text-4xl md:text-[3rem] font-light text-white">Кримінальне право</h2>
+      <div class="divider mt-7 max-w-xs"></div>
+    </div>
+
+    <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+
+      <!-- 1. Супровід під час обшуків -->
+      <div class="svc-card rounded-2xl p-7 reveal d-1">
+        <div class="w-9 h-9 rounded-xl flex items-center justify-center mb-6" style="background:rgba(176,144,96,0.12);">
+          <i data-lucide="search" class="w-4 h-4" style="color:var(--gold)"></i>
+        </div>
+        <h3 class="font-cormorant text-[1.2rem] font-semibold text-white mb-4">Супровід під час обшуків</h3>
+        <ul class="space-y-2.5">
+          <li class="check-li text-stone-400 text-[13px] font-light"><i data-lucide="chevron-right" class="w-3.5 h-3.5" style="color:var(--gold)"></i>Виїзд до місця обшуку</li>
+          <li class="check-li text-stone-400 text-[13px] font-light"><i data-lucide="chevron-right" class="w-3.5 h-3.5" style="color:var(--gold)"></i>Контроль законності дій правоохоронців</li>
+          <li class="check-li text-stone-400 text-[13px] font-light"><i data-lucide="chevron-right" class="w-3.5 h-3.5" style="color:var(--gold)"></i>Захист прав клієнта та фіксація можливих порушень</li>
+        </ul>
+      </div>
+
+      <!-- 2. Захист у разі затримання -->
+      <div class="svc-card rounded-2xl p-7 reveal d-2">
+        <div class="w-9 h-9 rounded-xl flex items-center justify-center mb-6" style="background:rgba(176,144,96,0.12);">
+          <i data-lucide="lock" class="w-4 h-4" style="color:var(--gold)"></i>
+        </div>
+        <h3 class="font-cormorant text-[1.2rem] font-semibold text-white mb-4">Захист у разі затримання</h3>
+        <ul class="space-y-2.5">
+          <li class="check-li text-stone-400 text-[13px] font-light"><i data-lucide="chevron-right" class="w-3.5 h-3.5" style="color:var(--gold)"></i>Невідкладний виїзд адвоката до місця затримання</li>
+          <li class="check-li text-stone-400 text-[13px] font-light"><i data-lucide="chevron-right" class="w-3.5 h-3.5" style="color:var(--gold)"></i>Надання правової допомоги відповідно до ст.&nbsp;59 Конституції України та ст.&nbsp;20 ЗУ «Про адвокатуру»</li>
+          <li class="check-li text-stone-400 text-[13px] font-light"><i data-lucide="chevron-right" class="w-3.5 h-3.5" style="color:var(--gold)"></i>Оскарження незаконного затримання та запобігання неправомірному триманню під вартою</li>
+        </ul>
+      </div>
+
+      <!-- 3. Представництво в судах -->
+      <div class="svc-card rounded-2xl p-7 reveal d-3">
+        <div class="w-9 h-9 rounded-xl flex items-center justify-center mb-6" style="background:rgba(176,144,96,0.12);">
+          <i data-lucide="gavel" class="w-4 h-4" style="color:var(--gold)"></i>
+        </div>
+        <h3 class="font-cormorant text-[1.2rem] font-semibold text-white mb-4">Представництво в судах</h3>
+        <ul class="space-y-2.5">
+          <li class="check-li text-stone-400 text-[13px] font-light"><i data-lucide="chevron-right" class="w-3.5 h-3.5" style="color:var(--gold)"></i>Захист клієнтів у кримінальних провадженнях будь-якої складності</li>
+          <li class="check-li text-stone-400 text-[13px] font-light"><i data-lucide="chevron-right" class="w-3.5 h-3.5" style="color:var(--gold)"></i>Формування стратегічної доказової бази</li>
+          <li class="check-li text-stone-400 text-[13px] font-light"><i data-lucide="chevron-right" class="w-3.5 h-3.5" style="color:var(--gold)"></i>Оскарження судових рішень для досягнення максимально вигідного результату</li>
+        </ul>
+      </div>
+
+      <!-- 4. Мобілізаційні спори -->
+      <div class="svc-card rounded-2xl p-7 reveal d-1">
+        <div class="w-9 h-9 rounded-xl flex items-center justify-center mb-6" style="background:rgba(176,144,96,0.12);">
+          <i data-lucide="shield-alert" class="w-4 h-4" style="color:var(--gold)"></i>
+        </div>
+        <h3 class="font-cormorant text-[1.2rem] font-semibold text-white mb-4">Мобілізаційні спори</h3>
+        <ul class="space-y-2.5">
+          <li class="check-li text-stone-400 text-[13px] font-light"><i data-lucide="chevron-right" class="w-3.5 h-3.5" style="color:var(--gold)"></i>Консультації щодо прав і обов'язків військовозобов'язаних</li>
+          <li class="check-li text-stone-400 text-[13px] font-light"><i data-lucide="chevron-right" class="w-3.5 h-3.5" style="color:var(--gold)"></i>Юридичний супровід у випадках незаконного призову чи відмови у звільненні</li>
+          <li class="check-li text-stone-400 text-[13px] font-light"><i data-lucide="chevron-right" class="w-3.5 h-3.5" style="color:var(--gold)"></i>Врегулювання спірних ситуацій із ТЦК та іншими структурами</li>
+        </ul>
+      </div>
+
+      <!-- 5. Захист репутації -->
+      <div class="svc-card rounded-2xl p-7 reveal d-2 sm:col-span-2 lg:col-span-2">
+        <div class="w-9 h-9 rounded-xl flex items-center justify-center mb-6" style="background:rgba(176,144,96,0.12);">
+          <i data-lucide="briefcase" class="w-4 h-4" style="color:var(--gold)"></i>
+        </div>
+        <h3 class="font-cormorant text-[1.2rem] font-semibold text-white mb-4">Захист честі, гідності та ділової репутації</h3>
+        <div class="grid sm:grid-cols-2 gap-2.5">
+          <div class="check-li text-stone-400 text-[13px] font-light"><i data-lucide="chevron-right" class="w-3.5 h-3.5 shrink-0" style="color:var(--gold)"></i>Юридична оцінка публікацій, висловлювань чи дій, що можуть завдати шкоди репутації</div>
+          <div class="check-li text-stone-400 text-[13px] font-light"><i data-lucide="chevron-right" class="w-3.5 h-3.5 shrink-0" style="color:var(--gold)"></i>Підготовка вимог про спростування недостовірної інформації та відшкодування моральної шкоди</div>
+          <div class="check-li text-stone-400 text-[13px] font-light"><i data-lucide="chevron-right" class="w-3.5 h-3.5 shrink-0" style="color:var(--gold)"></i>Представництво в судах у справах про образу чи наклеп</div>
+          <div class="check-li text-stone-400 text-[13px] font-light"><i data-lucide="chevron-right" class="w-3.5 h-3.5 shrink-0" style="color:var(--gold)"></i>Захист публічних осіб та бізнесу від репутаційних атак у ЗМІ та соцмережах</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- PROCESS -->
+<section id="process" class="py-24 md:py-32" style="background:var(--cream);">
+  <div class="max-w-5xl mx-auto px-5 sm:px-8">
+    <div class="mb-14 reveal">
+      <p class="text-[10px] tracking-[.2em] font-light mb-4" style="color:var(--gold)">ЯК ЦЕ ПРАЦЮЄ</p>
+      <h2 class="font-cormorant text-4xl md:text-[3rem] font-light leading-[1.1]">Етапи співпраці</h2>
+    </div>
+
+    <div class="space-y-0">
+
+      <!-- Step 1 -->
+      <div class="reveal d-1 grid md:grid-cols-[80px_1fr] gap-6 pb-10 border-b border-stone-200/70">
+        <div class="step-num">01</div>
+        <div class="pb-2">
+          <h3 class="font-cormorant text-[1.4rem] font-semibold mb-2">Первинний запит</h3>
+          <p class="text-stone-500 font-light text-[15px] leading-relaxed">
+            Наразі запити та питання ви можете писати мені в директ — коротко описуєте ситуацію і ми визначаємо, чи я можу допомогти. Після цього домовляємось про зручний час для детальної консультації.
+          </p>
+        </div>
+      </div>
+
+      <!-- Step 2 -->
+      <div class="reveal d-2 grid md:grid-cols-[80px_1fr] gap-6 py-10 border-b border-stone-200/70">
+        <div class="step-num">02</div>
+        <div>
+          <h3 class="font-cormorant text-[1.4rem] font-semibold mb-2">Консультація</h3>
+          <p class="text-stone-500 font-light text-[15px] leading-relaxed">
+            Ми детально розбираємо вашу ситуацію: яка ситуація зараз по факту, які є ризики, які варіанти розвитку подій. Консультація триває 40 хвилин, у форматі онлайн (в телефонному режимі, через месенджери). Ви можете задавати усі питання, які турбують. Після цього у вас вже є розуміння, що робити далі.
+          </p>
+        </div>
+      </div>
+
+      <!-- Step 3 -->
+      <div class="reveal d-3 grid md:grid-cols-[80px_1fr] gap-6 py-10 border-b border-stone-200/70">
+        <div class="step-num">03</div>
+        <div>
+          <h3 class="font-cormorant text-[1.4rem] font-semibold mb-2">Формування стратегії</h3>
+          <p class="text-stone-500 font-light text-[15px] leading-relaxed mb-3">
+            Це ключовий етап, на якому ми визначаємо:
+          </p>
+          <ul class="space-y-1.5 text-stone-500 text-[14px] font-light">
+            <li class="check-li"><i data-lucide="chevron-right" class="w-3.5 h-3.5 shrink-0 mt-0.5" style="color:var(--gold)"></i>які вимоги заявляти</li>
+            <li class="check-li"><i data-lucide="chevron-right" class="w-3.5 h-3.5 shrink-0 mt-0.5" style="color:var(--gold)"></i>що об'єднувати в один процес</li>
+            <li class="check-li"><i data-lucide="chevron-right" class="w-3.5 h-3.5 shrink-0 mt-0.5" style="color:var(--gold)"></i>як краще діяти саме у вашій ситуації</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Step 4 -->
+      <div class="reveal d-1 grid md:grid-cols-[80px_1fr] gap-6 py-10 border-b border-stone-200/70">
+        <div class="step-num">04</div>
+        <div>
+          <h3 class="font-cormorant text-[1.4rem] font-semibold mb-2">Підготовка документів</h3>
+          <p class="text-stone-500 font-light text-[15px] leading-relaxed">
+            Ми готуємо всі необхідні документи: позов, заяви, додатки. Від вас мінімум залучення — надати інформацію і документи.
+          </p>
+        </div>
+      </div>
+
+      <!-- Step 5 -->
+      <div class="reveal d-2 grid md:grid-cols-[80px_1fr] gap-6 py-10 border-b border-stone-200/70">
+        <div class="step-num">05</div>
+        <div>
+          <h3 class="font-cormorant text-[1.4rem] font-semibold mb-2">Супровід процесу</h3>
+          <p class="text-stone-500 font-light text-[15px] leading-relaxed mb-3">Ви не залишаєтесь один на один з процесом.</p>
+          <ul class="space-y-1.5 text-stone-500 text-[14px] font-light">
+            <li class="check-li"><i data-lucide="chevron-right" class="w-3.5 h-3.5 shrink-0 mt-0.5" style="color:var(--gold)"></i>Подача документів</li>
+            <li class="check-li"><i data-lucide="chevron-right" class="w-3.5 h-3.5 shrink-0 mt-0.5" style="color:var(--gold)"></i>Підготовка до засідань</li>
+            <li class="check-li"><i data-lucide="chevron-right" class="w-3.5 h-3.5 shrink-0 mt-0.5" style="color:var(--gold)"></i>Представництво (за потреби)</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Step 6 -->
+      <div class="reveal d-3 grid md:grid-cols-[80px_1fr] gap-6 pt-10">
+        <div class="step-num">06</div>
+        <div>
+          <h3 class="font-cormorant text-[1.4rem] font-semibold mb-2">Результат і подальші дії</h3>
+          <p class="text-stone-500 font-light text-[15px] leading-relaxed mb-3">Після рішення суду:</p>
+          <ul class="space-y-1.5 text-stone-500 text-[14px] font-light">
+            <li class="check-li"><i data-lucide="chevron-right" class="w-3.5 h-3.5 shrink-0 mt-0.5" style="color:var(--gold)"></i>Пояснюю, що воно означає</li>
+            <li class="check-li"><i data-lucide="chevron-right" class="w-3.5 h-3.5 shrink-0 mt-0.5" style="color:var(--gold)"></i>Що робити далі</li>
+            <li class="check-li"><i data-lucide="chevron-right" class="w-3.5 h-3.5 shrink-0 mt-0.5" style="color:var(--gold)"></i>Як забезпечити виконання (наприклад, по аліментах)</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- CTA in process -->
+    <div class="mt-14 rounded-2xl p-8 md:p-10 reveal" style="background:#111010;">
+      <p class="font-cormorant text-[1.5rem] md:text-[1.8rem] font-light text-white leading-snug mb-3">
+        Робота з адвокатом — про те, щоб пройти процес спокійніше і без зайвих помилок.
+      </p>
+      <p class="text-stone-400 font-light text-[14px] mb-6">Якщо ви зараз у точці, коли не розумієте, що робити — залиште заявку. Розберемо вашу ситуацію і визначимо шляхи вирішення.</p>
+      <a href="#contact" class="inline-flex items-center gap-2 px-6 py-3.5 rounded-full text-white text-[12px] tracking-[.12em] font-light transition-all hover:opacity-85" style="background:var(--wine);">ЗАЛИШИТИ ЗАЯВКУ</a>
+    </div>
+  </div>
+</section>
+
+<!-- PRICES -->
+<section id="prices" class="py-24 md:py-32" style="background:#111010;">
+  <div class="max-w-6xl mx-auto px-5 sm:px-8">
+    <div class="mb-14 reveal">
+      <p class="text-[10px] tracking-[.2em] font-light mb-4" style="color:var(--gold)">ЦІНИ</p>
+      <h2 class="font-cormorant text-4xl md:text-[3rem] font-light text-white">Ціни на основні послуги — Сімейне право</h2>
+      <div class="divider mt-7 max-w-sm"></div>
+    </div>
+
+    <div class="grid sm:grid-cols-2 xl:grid-cols-4 gap-5">
+
+      <!-- Card 1 -->
+      <div class="price-card rounded-2xl p-7 flex flex-col reveal d-1">
+        <div class="flex items-start justify-between mb-5">
+          <span class="text-[10px] tracking-[.18em] text-stone-400 font-light">01</span>
+          <i data-lucide="message-circle" class="w-4 h-4" style="color:var(--wine)"></i>
+        </div>
+        <h3 class="font-cormorant text-[1.35rem] font-semibold mb-1">Консультація</h3>
+        <p class="text-stone-400 text-[12px] font-light mb-5 leading-relaxed flex-1">Перший крок — зрозуміти ситуацію та варіанти дій</p>
+        <div class="divider mb-5"></div>
+        <div class="mb-5">
+          <p class="font-cormorant text-[2rem] font-light" style="color:var(--wine)">2 000 <span class="text-[1.1rem]">грн</span></p>
+          <p class="text-stone-400 text-[12px] font-light mt-0.5 flex items-center gap-1.5"><i data-lucide="clock" class="w-3 h-3"></i> 40 хвилин</p>
+        </div>
+        <div class="mb-5 space-y-1.5">
+          <p class="text-[10px] tracking-[.15em] text-stone-400 font-light mb-2">ПІДІЙДЕ, ЯКЩО:</p>
+          <p class="text-stone-500 text-[13px] font-light leading-snug">Ви розгублені й не знаєте, з чого почати</p>
+          <p class="text-stone-500 text-[13px] font-light leading-snug">Хочете зрозуміти ситуацію перш ніж діяти</p>
+          <p class="text-stone-500 text-[13px] font-light leading-snug">Боїтесь зробити крок, який зашкодить справі</p>
+        </div>
+        <div class="mt-auto space-y-1.5">
+          <p class="text-[10px] tracking-[.15em] text-stone-400 font-light mb-2">ЩО ВКЛЮЧЕНО:</p>
+          <div class="check-li text-stone-500 text-[13px] font-light"><i data-lucide="check" class="w-3 h-3 shrink-0" style="color:var(--gold)"></i>Аналіз вашої ситуації</div>
+          <div class="check-li text-stone-500 text-[13px] font-light"><i data-lucide="check" class="w-3 h-3 shrink-0" style="color:var(--gold)"></i>Можливі сценарії розвитку</div>
+          <div class="check-li text-stone-500 text-[13px] font-light"><i data-lucide="check" class="w-3 h-3 shrink-0" style="color:var(--gold)"></i>Оцінка ризиків рішень</div>
+          <div class="check-li text-stone-500 text-[13px] font-light"><i data-lucide="check" class="w-3 h-3 shrink-0" style="color:var(--gold)"></i>Рекомендації щодо документів</div>
+        </div>
+        <button onclick="chooseService('Консультація — 2 000 грн / 40 хв')" class="mt-6 block w-full text-center py-3 rounded-full text-[11px] tracking-widest font-light border transition-all hover:bg-stone-50 cursor-pointer" style="border-color:var(--wine); color:var(--wine);">ОБРАТИ</button>
+      </div>
+
+      <!-- Card 2 -->
+      <div class="price-card rounded-2xl p-7 flex flex-col reveal d-2">
+        <div class="flex items-start justify-between mb-5">
+          <span class="text-[10px] tracking-[.18em] text-stone-400 font-light">02</span>
+          <i data-lucide="pen-line" class="w-4 h-4" style="color:var(--wine)"></i>
+        </div>
+        <h3 class="font-cormorant text-[1.35rem] font-semibold mb-1">Позовна заява</h3>
+        <p class="text-stone-400 text-[12px] font-light mb-5 leading-relaxed flex-1">Для тих, хто подає самостійно, але хоче зробити правильно</p>
+        <div class="divider mb-5"></div>
+        <div class="mb-5">
+          <p class="font-cormorant text-[2rem] font-light" style="color:var(--wine)">3 500 <span class="text-[1.1rem]">грн</span></p>
+          <p class="text-stone-400 text-[12px] font-light mt-0.5 flex items-center gap-1.5"><i data-lucide="clock" class="w-3 h-3"></i> Фіксована ціна</p>
+        </div>
+        <div class="mb-5 space-y-1.5">
+          <p class="text-[10px] tracking-[.15em] text-stone-400 font-light mb-2">ПІДІЙДЕ, ЯКЩО:</p>
+          <p class="text-stone-500 text-[13px] font-light leading-snug">Готові діяти, але не хочете ризикувати через шаблони з інтернету</p>
+          <p class="text-stone-500 text-[13px] font-light leading-snug">Важливо, щоб позиція була правильно сформована з першого разу</p>
+        </div>
+        <div class="mt-auto space-y-1.5">
+          <p class="text-[10px] tracking-[.15em] text-stone-400 font-light mb-2">ЩО ВКЛЮЧЕНО:</p>
+          <div class="check-li text-stone-500 text-[13px] font-light"><i data-lucide="check" class="w-3 h-3 shrink-0" style="color:var(--gold)"></i>Аналіз ситуації та правова позиція</div>
+          <div class="check-li text-stone-500 text-[13px] font-light"><i data-lucide="check" class="w-3 h-3 shrink-0" style="color:var(--gold)"></i>Індивідуальна позовна заява</div>
+          <div class="check-li text-stone-500 text-[13px] font-light"><i data-lucide="check" class="w-3 h-3 shrink-0" style="color:var(--gold)"></i>Рекомендації після подачі позову</div>
+        </div>
+        <button onclick="chooseService('Складання позовної заяви — 3 500 грн')" class="mt-6 block w-full text-center py-3 rounded-full text-[11px] tracking-widest font-light border transition-all hover:bg-stone-50 cursor-pointer" style="border-color:var(--wine); color:var(--wine);">ОБРАТИ</button>
+      </div>
+
+      <!-- Card 3 -->
+      <div class="price-card rounded-2xl p-7 flex flex-col reveal d-3">
+        <div class="flex items-start justify-between mb-5">
+          <span class="text-[10px] tracking-[.18em] text-stone-400 font-light">03</span>
+          <i data-lucide="scale" class="w-4 h-4" style="color:var(--wine)"></i>
+        </div>
+        <h3 class="font-cormorant text-[1.35rem] font-semibold mb-1">Повний супровід розлучення</h3>
+        <p class="text-stone-400 text-[12px] font-light mb-5 leading-relaxed flex-1">Від подачі позову до рішення суду</p>
+        <div class="divider mb-5"></div>
+        <div class="mb-5">
+          <p class="font-cormorant text-[2rem] font-light" style="color:var(--wine)">від 10 000 <span class="text-[1.1rem]">грн</span></p>
+          <p class="text-stone-400 text-[12px] font-light mt-0.5 flex items-center gap-1.5"><i data-lucide="clock" class="w-3 h-3"></i> До рішення суду</p>
+        </div>
+        <div class="mb-5 space-y-1.5">
+          <p class="text-[10px] tracking-[.15em] text-stone-400 font-light mb-2">ПІДІЙДЕ, ЯКЩО:</p>
+          <p class="text-stone-500 text-[13px] font-light leading-snug">Важко емоційно, немає ресурсу розбиратись у процесі</p>
+          <p class="text-stone-500 text-[13px] font-light leading-snug">Важливо, щоб справу вели від початку до результату</p>
+        </div>
+        <div class="mt-auto space-y-1.5">
+          <p class="text-[10px] tracking-[.15em] text-stone-400 font-light mb-2">Я БЕРУ НА СЕБЕ:</p>
+          <div class="check-li text-stone-500 text-[13px] font-light"><i data-lucide="check" class="w-3 h-3 shrink-0" style="color:var(--gold)"></i>Стратегія розлучення</div>
+          <div class="check-li text-stone-500 text-[13px] font-light"><i data-lucide="check" class="w-3 h-3 shrink-0" style="color:var(--gold)"></i>Підготовка та подача позову</div>
+          <div class="check-li text-stone-500 text-[13px] font-light"><i data-lucide="check" class="w-3 h-3 shrink-0" style="color:var(--gold)"></i>Представництво в суді</div>
+          <div class="check-li text-stone-500 text-[13px] font-light"><i data-lucide="check" class="w-3 h-3 shrink-0" style="color:var(--gold)"></i>Комунікація з іншою стороною</div>
+        </div>
+        <button onclick="chooseService('Повний супровід розлучення — від 10 000 грн')" class="mt-6 block w-full text-center py-3 rounded-full text-[11px] tracking-widest font-light border transition-all hover:bg-stone-50 cursor-pointer" style="border-color:var(--wine); color:var(--wine);">ОБРАТИ</button>
+      </div>
+
+      <!-- Card 4 -->
+      <div class="price-card rounded-2xl p-7 flex flex-col reveal d-4">
+        <div class="flex items-start justify-between mb-5">
+          <span class="text-[10px] tracking-[.18em] text-stone-400 font-light">04</span>
+          <i data-lucide="users" class="w-4 h-4" style="color:var(--wine)"></i>
+        </div>
+        <h3 class="font-cormorant text-[1.35rem] font-semibold mb-1">Розлучення + Аліменти</h3>
+        <p class="text-stone-400 text-[12px] font-light mb-5 leading-relaxed flex-1">Комплексний супровід</p>
+        <div class="divider mb-5"></div>
+        <div class="mb-5">
+          <p class="font-cormorant text-[2rem] font-light" style="color:var(--wine)">від 15 000 <span class="text-[1.1rem]">грн</span></p>
+          <p class="text-stone-400 text-[12px] font-light mt-0.5 flex items-center gap-1.5"><i data-lucide="clock" class="w-3 h-3"></i> До рішення суду</p>
+        </div>
+        <div class="mb-5 space-y-1.5">
+          <p class="text-[10px] tracking-[.15em] text-stone-400 font-light mb-2">ПІДІЙДЕ, ЯКЩО:</p>
+          <p class="text-stone-500 text-[13px] font-light leading-snug">Є питання аліментів і ви не хочете боротись самостійно</p>
+          <p class="text-stone-500 text-[13px] font-light leading-snug">Потрібний захист усіх аспектів справи</p>
+        </div>
+        <div class="mt-auto space-y-1.5">
+          <p class="text-[10px] tracking-[.15em] text-stone-400 font-light mb-2">В РАМКАХ СУПРОВОДУ:</p>
+          <div class="check-li text-stone-500 text-[13px] font-light"><i data-lucide="check" class="w-3 h-3 shrink-0" style="color:var(--gold)"></i>Аналіз ситуації та доходів</div>
+          <div class="check-li text-stone-500 text-[13px] font-light"><i data-lucide="check" class="w-3 h-3 shrink-0" style="color:var(--gold)"></i>Стратегія розлучення</div>
+          <div class="check-li text-stone-500 text-[13px] font-light"><i data-lucide="check" class="w-3 h-3 shrink-0" style="color:var(--gold)"></i>Позов та вимоги щодо аліментів</div>
+          <div class="check-li text-stone-500 text-[13px] font-light"><i data-lucide="check" class="w-3 h-3 shrink-0" style="color:var(--gold)"></i>Представництво в суді</div>
+        </div>
+        <button onclick="chooseService('Розлучення + Аліменти — від 15 000 грн')" class="mt-6 block w-full text-center py-3 rounded-full text-[11px] tracking-widest font-light border transition-all hover:bg-stone-50 cursor-pointer" style="border-color:var(--wine); color:var(--wine);">ОБРАТИ</button>
+      </div>
+
+    </div>
+
+    <p class="mt-10 text-center text-stone-500 text-[13px] font-light reveal">
+      Ціна на кримінальні справи та захист репутації визначається індивідуально після аналізу ситуації.<br>
+      Якщо не знайшли свого запиту — залиште заявку, я підкажу чим можу бути корисна.
+    </p>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact" class="py-24 md:py-32" style="background:var(--cream);">
+  <div class="max-w-5xl mx-auto px-5 sm:px-8">
+    <div class="grid md:grid-cols-2 gap-14 md:gap-20 items-start">
+      <div class="reveal">
+        <p class="text-[10px] tracking-[.2em] font-light mb-4" style="color:var(--gold)">КОНТАКТ</p>
+        <h2 class="font-cormorant text-4xl md:text-[3rem] font-light leading-[1.1] mb-6">
+          Запишіться на<br>консультацію
+        </h2>
+        <div class="divider mb-8 max-w-xs"></div>
+        <p class="text-stone-600 font-light text-[15px] leading-relaxed mb-10">
+          Залиште заявку — я зв'яжусь із вами впродовж одного робочого дня. Перша розмова допоможе зрозуміти вашу ситуацію та можливі кроки.
+        </p>
+        <div class="rounded-2xl overflow-hidden mb-8" style="aspect-ratio:3/4; max-height:380px;">
+          <img src="contact.jpg" alt="Ілона Борзенко" class="w-full h-full object-cover object-top">
+        </div>
+        <div class="space-y-4">
+          <a href="javascript:void(0)" onclick="openModal('concept')" class="flex items-center gap-3 text-stone-500 hover:text-stone-800 transition-colors group">
+            <div class="w-9 h-9 rounded-xl flex items-center justify-center shrink-0" style="background:rgba(176,144,96,0.1);">
+              <img src="data:image/png;base64,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" alt="Instagram" class="w-5 h-5 rounded-sm">
+            </div>
+            <span class="text-[14px] font-light">@advocatekyiv</span>
+          </a>
+
+        </div>
+      </div>
+
+      <!-- FORM -->
+      <div class="reveal d-1">
+        <form id="contact-form" action="https://formspree.io/f/YOUR_FORM_ID" method="POST" class="space-y-4">
+          <div>
+            <label class="block text-[10px] tracking-[.18em] text-stone-500 font-light mb-2">ІМ'Я *</label>
+            <input type="text" name="name" id="field-name" required placeholder="Ваше ім'я">
+          </div>
+          <div>
+            <label class="block text-[10px] tracking-[.18em] text-stone-500 font-light mb-2">ТЕЛЕФОН *</label>
+            <input type="tel" name="phone" id="field-phone" required placeholder="+380 __ ___ __ __">
+          </div>
+          <div>
+            <label class="block text-[10px] tracking-[.18em] text-stone-500 font-light mb-2">ПОСЛУГА</label>
+            <select name="service" id="field-service">
+              <option value="">Оберіть послугу</option>
+              <option value="Консультація — 2 000 грн / 40 хв">Консультація — 2 000 грн / 40 хв</option>
+              <option value="Складання позовної заяви — 3 500 грн">Складання позовної заяви — 3 500 грн</option>
+              <option value="Повний супровід розлучення — від 10 000 грн">Повний супровід розлучення — від 10 000 грн</option>
+              <option value="Розлучення + Аліменти — від 15 000 грн">Розлучення + Аліменти — від 15 000 грн</option>
+              <option value="Кримінальне право">Кримінальне право</option>
+              <option value="Мобілізаційні спори">Мобілізаційні спори</option>
+              <option value="Захист репутації">Захист репутації</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-[10px] tracking-[.18em] text-stone-500 font-light mb-2">ПОВІДОМЛЕННЯ</label>
+            <textarea name="message" rows="4" placeholder="Коротко опишіть вашу ситуацію..."></textarea>
+          </div>
+
+          <div id="success-msg" class="hidden rounded-2xl p-4 text-[13px] font-light" style="background:rgba(176,144,96,0.08); border:1px solid rgba(176,144,96,0.25); color:#8a6c3a;">
+            ✓ Дякую! Отримала вашу заявку — зв'яжусь найближчим часом.
+          </div>
+          <div id="error-msg" class="hidden rounded-2xl p-4 text-[13px] font-light" style="background:rgba(200,50,50,0.08); border:1px solid rgba(200,50,50,0.18); color:#b55;">
+            Щось пішло не так. Напишіть мені в Instagram.
+          </div>
+
+          <button type="submit" id="submit-btn" class="w-full py-4 rounded-2xl text-white text-[11px] tracking-[.18em] font-light transition-all hover:opacity-85 flex items-center justify-center gap-2" style="background:var(--wine);">
+            <span id="btn-text">НАДІСЛАТИ ЗАЯВКУ</span>
+            <i data-lucide="loader-2" class="w-3.5 h-3.5 hidden animate-spin" id="btn-loader"></i>
+          </button>
+          <p class="text-stone-400 text-[11px] font-light text-center tracking-wide">
+            Надсилаючи заявку, ви погоджуєтесь з 
+            <button type="button" onclick="openModal('privacy')" class="underline hover:text-stone-600 transition-colors">Політикою конфіденційності</button>
+          </p>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer style="background:#0a0909;" class="py-10 px-5 border-t border-white/5">
+  <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-6">
+    <div>
+      <p class="font-cormorant text-[1.4rem] font-light text-white">Ілона <span style="color:var(--gold)">Борзенко</span></p>
+      <p class="text-stone-600 text-[11px] font-light mt-0.5 tracking-wide">Адвокат · Кримінальне та сімейне право</p>
+    </div>
+    <div class="flex flex-wrap justify-center gap-5 text-stone-500 text-[11px] font-light tracking-widest">
+      <a href="#about" class="hover:text-stone-300 transition-colors">ПРО МЕНЕ</a>
+      <a href="#services" class="hover:text-stone-300 transition-colors">ПОСЛУГИ</a>
+      <a href="#process" class="hover:text-stone-300 transition-colors">ПРОЦЕС</a>
+      <a href="#prices" class="hover:text-stone-300 transition-colors">ЦІНИ</a>
+      <a href="#contact" class="hover:text-stone-300 transition-colors">КОНТАКТ</a>
+    </div>
+    <a href="javascript:void(0)" onclick="openModal('concept')" class="flex items-center gap-2 text-stone-500 hover:text-stone-300 transition-colors text-[12px] font-light">
+      <img src="data:image/png;base64,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" alt="Instagram" class="w-4 h-4 rounded-sm">
+      @advocatekyiv
+    </a>
+  </div>
+  <div class="max-w-6xl mx-auto mt-7 pt-6 border-t border-white/5 flex flex-col sm:flex-row items-center justify-between gap-3">
+    <p class="text-stone-700 text-[11px] font-light">© 2026 Ілона Борзенко. Всі права захищено.</p>
+    <div class="flex gap-5 text-stone-700 text-[11px] font-light">
+      <button onclick="openModal('privacy')" class="hover:text-stone-400 transition-colors underline underline-offset-2">Політика конфіденційності</button>
+      <button onclick="openModal('cookies')" class="hover:text-stone-400 transition-colors underline underline-offset-2">Політика cookies</button>
+    </div>
+  </div>
+</footer>
+
+<!-- COOKIE BANNER -->
+<div id="cookie-banner">
+  <div class="max-w-5xl mx-auto px-5 py-5 flex flex-col sm:flex-row items-start sm:items-center gap-4 justify-between">
+    <p class="text-stone-300 text-[13px] font-light leading-relaxed flex-1">
+      Цей сайт використовує cookies для коректної роботи форми зворотного зв'язку. Продовжуючи, ви погоджуєтесь з нашою
+      <button onclick="openModal('cookies')" class="underline text-stone-400 hover:text-white transition-colors">Політикою cookies</button>.
+    </p>
+    <div class="flex gap-3 shrink-0">
+      <button onclick="declineCookies()" class="text-[11px] tracking-widest text-stone-500 hover:text-stone-300 transition-colors font-light">ВІДХИЛИТИ</button>
+      <button onclick="acceptCookies()" class="text-[11px] tracking-widest px-5 py-2.5 rounded-full text-white font-light transition-all hover:opacity-85" style="background:var(--gold);">ПРИЙНЯТИ</button>
+    </div>
+  </div>
+</div>
+
+<!-- PRIVACY MODAL -->
+<div id="modal-privacy" class="modal-overlay" onclick="if(event.target===this)closeModal('privacy')">
+  <div class="modal-box">
+    <button onclick="closeModal('privacy')" class="absolute top-5 right-5 text-stone-400 hover:text-stone-700 transition-colors">
+      <i data-lucide="x" class="w-5 h-5"></i>
+    </button>
+    <h2 class="font-cormorant text-[1.8rem] font-semibold mb-6">Політика конфіденційності</h2>
+    <div class="space-y-4 text-stone-600 font-light text-[14px] leading-relaxed">
+      <p><strong class="font-medium text-stone-800">1. Загальні положення</strong><br>
+      Ця політика конфіденційності пояснює, як Ілона Борзенко («Адвокат», «ми», «нас») збирає, використовує та захищає персональні дані відвідувачів цього сайту.</p>
+      <p><strong class="font-medium text-stone-800">2. Які дані ми збираємо</strong><br>
+      При заповненні форми зворотного зв'язку ми збираємо: ваше ім'я, номер телефону, обрану послугу та опис вашої ситуації (якщо ви вирішите його надати).</p>
+      <p><strong class="font-medium text-stone-800">3. Для чого використовуються дані</strong><br>
+      Персональні дані використовуються виключно для зв'язку з вами та надання юридичних послуг. Ми не продаємо та не передаємо ваші дані третім особам без вашої згоди.</p>
+      <p><strong class="font-medium text-stone-800">4. Зберігання даних</strong><br>
+      Дані зберігаються стільки часу, скільки необхідно для виконання зазначених цілей або до вашого запиту на видалення. Для видалення своїх даних напишіть нам у Instagram @advocatekyiv.</p>
+      <p><strong class="font-medium text-stone-800">5. Безпека</strong><br>
+      Передача даних форми здійснюється через захищений сервіс Formspree. Ми вживаємо всіх розумних заходів для захисту ваших персональних даних.</p>
+      <p><strong class="font-medium text-stone-800">6. Ваші права</strong><br>
+      Ви маєте право на доступ до своїх персональних даних, їх виправлення або видалення відповідно до законодавства України.</p>
+      <p class="text-stone-400 text-[12px]">Дата оновлення: 27 квітня 2026 р.</p>
+    </div>
+  </div>
+</div>
+
+<!-- COOKIES MODAL -->
+<div id="modal-cookies" class="modal-overlay" onclick="if(event.target===this)closeModal('cookies')">
+  <div class="modal-box">
+    <button onclick="closeModal('cookies')" class="absolute top-5 right-5 text-stone-400 hover:text-stone-700 transition-colors">
+      <i data-lucide="x" class="w-5 h-5"></i>
+    </button>
+    <h2 class="font-cormorant text-[1.8rem] font-semibold mb-6">Політика cookies</h2>
+    <div class="space-y-4 text-stone-600 font-light text-[14px] leading-relaxed">
+      <p><strong class="font-medium text-stone-800">Що таке cookies?</strong><br>
+      Cookies — це невеликі текстові файли, які зберігаються у вашому браузері під час відвідування сайту.</p>
+      <p><strong class="font-medium text-stone-800">Які cookies ми використовуємо?</strong><br>
+      Цей сайт використовує мінімальний набір cookies, необхідний для коректної роботи:</p>
+      <ul class="space-y-2 ml-4">
+        <li class="check-li"><i data-lucide="chevron-right" class="w-3.5 h-3.5 shrink-0" style="color:var(--gold)"></i><span><strong class="font-medium">Технічні cookies</strong> — необхідні для базової роботи сайту та форми зворотного зв'язку (Formspree).</span></li>
+        <li class="check-li"><i data-lucide="chevron-right" class="w-3.5 h-3.5 shrink-0" style="color:var(--gold)"></i><span><strong class="font-medium">Cookies налаштувань</strong> — зберігають вашу відповідь на цей банер (щоб не показувати його знову).</span></li>
+      </ul>
+      <p><strong class="font-medium text-stone-800">Ми не використовуємо:</strong><br>
+      Рекламні cookies, трекінгові cookies, cookies соціальних мереж та аналітичні cookies третіх сторін.</p>
+      <p><strong class="font-medium text-stone-800">Як керувати cookies?</strong><br>
+      Ви можете будь-коли видалити cookies через налаштування свого браузера. Зверніть увагу, що відключення технічних cookies може вплинути на роботу форми сайту.</p>
+      <p class="text-stone-400 text-[12px]">Дата оновлення: 27 квітня 2026 р.</p>
+    </div>
+  </div>
+</div>
+
+<!-- FLOATING CTA -->
+<a href="#field-name" onclick="event.preventDefault();document.getElementById('field-name').scrollIntoView({behavior:'smooth',block:'center'});setTimeout(()=>document.getElementById('field-name').focus(),400);" id="floating-cta" aria-label="Залишити заявку">
+  <i data-lucide="phone" class="w-5 h-5 text-white"></i>
+</a>
+
+<script>
+  lucide.createIcons();
+
+  // Mobile drawer
+  const burger = document.getElementById('burger');
+  const drawer = document.getElementById('mobile-drawer');
+  burger.addEventListener('click', () => {
+    drawer.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  });
+  function closeMob() {
+    drawer.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  // Scroll reveal
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('in'); });
+  }, { threshold: 0.08 });
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+  // Choose service from price cards → auto-select in form
+  function chooseService(val) {
+    document.getElementById('field-service').value = val;
+    document.getElementById('contact').scrollIntoView({ behavior: 'smooth' });
+  }
+
+  // Form submit
+  const form = document.getElementById('contact-form');
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const nameEl = document.getElementById('field-name');
+    const phoneEl = document.getElementById('field-phone');
+    const successMsg = document.getElementById('success-msg');
+    const errorMsg = document.getElementById('error-msg');
+    const btn = document.getElementById('submit-btn');
+    const btnText = document.getElementById('btn-text');
+    const btnLoader = document.getElementById('btn-loader');
+
+    let valid = true;
+    [nameEl, phoneEl].forEach(el => {
+      if (!el.value.trim()) {
+        el.style.borderColor = '#c0392b';
+        valid = false;
+      } else {
+        el.style.borderColor = 'rgba(176,144,96,0.28)';
+      }
+    });
+    if (!valid) return;
+
+    btn.disabled = true;
+    btnText.textContent = 'НАДСИЛАЄМО...';
+    btnLoader.classList.remove('hidden');
+
+    try {
+      const res = await fetch(form.action, {
+        method:'POST', body: new FormData(form),
+        headers: {'Accept':'application/json'}
+      });
+      if (res.ok) {
+        successMsg.classList.remove('hidden');
+        errorMsg.classList.add('hidden');
+        form.reset();
+        btnText.textContent = 'НАДІСЛАНО ✓';
+      } else throw new Error();
+    } catch {
+      errorMsg.classList.remove('hidden');
+      successMsg.classList.add('hidden');
+      btnText.textContent = 'НАДІСЛАТИ ЗАЯВКУ';
+      btn.disabled = false;
+    }
+    btnLoader.classList.add('hidden');
+  });
+
+  // Cookie banner
+  function acceptCookies() {
+    localStorage.setItem('cookies_accepted', '1');
+    document.getElementById('cookie-banner').classList.remove('show');
+  }
+  function declineCookies() {
+    localStorage.setItem('cookies_accepted', '0');
+    document.getElementById('cookie-banner').classList.remove('show');
+  }
+  window.addEventListener('load', () => {
+    if (!localStorage.getItem('cookies_accepted')) {
+      setTimeout(() => document.getElementById('cookie-banner').classList.add('show'), 1200);
+    }
+  });
+
+  // Modals
+  function openModal(id) {
+    document.getElementById('modal-' + id).classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeModal(id) {
+    document.getElementById('modal-' + id).classList.remove('open');
+    document.body.style.overflow = '';
+  }
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') {
+      ['privacy','cookies','concept'].forEach(id => closeModal(id));
+    }
+  });
+</script>
+
+<!-- CONCEPT MODAL -->
+<div id="modal-concept" class="modal-overlay" onclick="if(event.target===this)closeModal('concept')">
+  <div class="modal-box" style="max-width:440px; text-align:center;">
+    <button onclick="closeModal('concept')" class="absolute top-5 right-5 text-stone-400 hover:text-stone-700 transition-colors">
+      <i data-lucide="x" class="w-5 h-5"></i>
+    </button>
+    <div class="mb-5" style="color:var(--wine)">
+      <i data-lucide="instagram" class="w-8 h-8 mx-auto"></i>
+    </div>
+    <p class="font-cormorant text-[1.5rem] font-light leading-relaxed text-stone-800 mb-7">Це концептуальний сайт.<br>При створенні сайту для Вас, цей лінк вестиме на Ваші соціальні мережі. 😉</p>
+    <button onclick="closeModal('concept')" class="inline-block px-8 py-3 rounded-full text-white text-[11px] tracking-widest font-light transition-all hover:opacity-85" style="background:var(--wine);">ЗРОЗУМІЛО</button>
+  </div>
+</div>
+</body>
+</html>
